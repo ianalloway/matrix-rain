@@ -1,2 +1,2 @@
-export { default, MatrixRain } from './MatrixRain';
+export { default } from './MatrixRain';
 export type { MatrixRainProps } from './MatrixRain';
