@@ -1,0 +1,61 @@
+{
+  "name": "@ianalloway/matrix-rain",
+  "version": "1.0.0",
+  "description": "Matrix digital rain animation for React — HiDPI/retina support, auto-pause when tab hidden, respects prefers-reduced-motion. Zero dependencies.",
+  "author": "Ian Alloway <ian@allowayllc.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "files": ["dist"],
+  "keywords": [
+    "matrix",
+    "rain",
+    "animation",
+    "canvas",
+    "react",
+    "terminal",
+    "cyberpunk",
+    "hacker",
+    "hud"
+  ],
+  "homepage": "https://github.com/ianalloway/matrix-rain",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ianalloway/matrix-rain.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ianalloway/matrix-rain/issues"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.5.0",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  }
+}
