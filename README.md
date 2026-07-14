@@ -85,6 +85,7 @@ function App() {
 
 ```bash
 npm install
+npm test           # smoke test (vitest)
 npm run build      # produces dist/
 npm run dev        # watch mode
 ```
