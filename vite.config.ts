@@ -9,7 +9,7 @@ const entry = resolve(__dirname, 'src/index.ts');
 export default defineConfig(({ mode }) => {
   const isCjs = mode === 'cjs';
   return {
-    plugins: [react(), dts({ insertTypesEntry: true })],
+    plugins: [react(), dts({ insertTypesEntry: true, exclude: ['src/**/*.test.tsx', 'src/**/*.test.ts'] })],
     build: {
       lib: {
         entry,
