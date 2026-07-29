@@ -2,7 +2,6 @@
 
 Matrix-style digital rain animation for React — HiDPI/retina support, auto-pause when tab is hidden, respects `prefers-reduced-motion`. **Zero dependencies.**
 
-[![npm](https://img.shields.io/npm/v/@ianalloway/matrix-rain)](https://www.npmjs.com/package/@ianalloway/matrix-rain)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)](https://www.typescriptlang.org)
@@ -11,7 +10,7 @@ Matrix-style digital rain animation for React — HiDPI/retina support, auto-pau
 ## Install
 
 ```bash
-npm install @ianalloway/matrix-rain
+npm install github:ianalloway/matrix-rain
 ```
 
 ## Usage
