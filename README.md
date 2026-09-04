@@ -9,9 +9,13 @@ Matrix-style digital rain animation for React — HiDPI/retina support, auto-pau
 
 ## Install
 
+> **npm publish pending** — `@ianalloway/matrix-rain` is **not** on the npm registry yet (the unscoped `matrix-rain` name belongs to an unrelated CLI). Install from GitHub until then:
+
 ```bash
 npm install github:ianalloway/matrix-rain
 ```
+
+`dist/` is gitignored; a `prepare` script rebuilds on install. From a checkout: `npm install && npm run build`.
 
 ## Usage
 
