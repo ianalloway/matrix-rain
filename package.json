@@ -57,6 +57,7 @@
     "build": "npm run build:esm && npm run build:cjs",
     "build:esm": "vite build",
     "build:cjs": "vite build --mode cjs",
+    "prepare": "npm run build",
     "dev": "vite build --watch",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
