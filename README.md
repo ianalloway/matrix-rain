@@ -1,21 +1,24 @@
 # @ianalloway/matrix-rain
 
-Matrix-style digital rain animation for React — HiDPI/retina support, auto-pause when tab is hidden, respects `prefers-reduced-motion`. **Zero dependencies.**
+Matrix-style digital rain animation for React — HiDPI/retina support, auto-pause when tab is hidden, respects `prefers-reduced-motion`. **Zero runtime dependencies** (React is a peer).
 
+[![CI](https://github.com/ianalloway/matrix-rain/actions/workflows/ci.yml/badge.svg)](https://github.com/ianalloway/matrix-rain/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/badge/npm-not%20yet%20published-lightgrey?logo=npm)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev)
+[![React](https://img.shields.io/badge/React-18%2B-61dafb?logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)](https://www.typescriptlang.org)
-[![Zero dependencies](https://img.shields.io/badge/dependencies-zero-16c784)]()
+[![Zero dependencies](https://img.shields.io/badge/dependencies-zero-16c784)](#features)
 
 ## Install
 
-> **npm publish pending** — `@ianalloway/matrix-rain` is **not** on the npm registry yet (the unscoped `matrix-rain` name belongs to an unrelated CLI). Install from GitHub until then:
+> **npm publish pending** — [`@ianalloway/matrix-rain`](https://www.npmjs.com/package/@ianalloway/matrix-rain) is **not** on the registry yet (the unscoped [`matrix-rain`](https://www.npmjs.com/package/matrix-rain) name belongs to an unrelated CLI). Install from GitHub until publish:
 
 ```bash
 npm install github:ianalloway/matrix-rain
+# or: yarn add ianalloway/matrix-rain
 ```
 
-`dist/` is gitignored; a `prepare` script rebuilds on install. From a checkout: `npm install && npm run build`.
+Homepage: [github.com/ianalloway/matrix-rain](https://github.com/ianalloway/matrix-rain). `dist/` is gitignored; the `prepare` script rebuilds on install. From a checkout: `npm install && npm run build`.
 
 ## Usage
 
@@ -82,7 +85,7 @@ function App() {
 - **Battery friendly** — Animation pauses when the tab is hidden, resumes when visible.
 - **Accessible** — `aria-hidden="true"` by default. Respects `prefers-reduced-motion`.
 - **Performant** — Frame rate capped at 35fps, requestAnimationFrame for smooth animation.
-- **Zero dependencies** — Pure React + browser Canvas 2D API.
+- **Zero runtime dependencies** — Pure React (peer) + browser Canvas 2D API. No animation libraries.
 
 ## Development
 

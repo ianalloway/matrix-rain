@@ -1,7 +1,7 @@
 {
   "name": "@ianalloway/matrix-rain",
   "version": "1.0.0",
-  "description": "Matrix digital rain animation for React — HiDPI/retina support, auto-pause when tab hidden, respects prefers-reduced-motion. Zero dependencies.",
+  "description": "Matrix digital rain animation for React — HiDPI/retina, auto-pause when tab hidden, respects prefers-reduced-motion. Zero runtime dependencies (React is a peer).",
   "author": "Ian Alloway <ian@allowayllc.com>",
   "license": "MIT",
   "type": "module",
@@ -15,7 +15,9 @@
       "require": "./dist/index.cjs"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "matrix",
     "rain",
@@ -27,7 +29,7 @@
     "hacker",
     "hud"
   ],
-  "homepage": "https://github.com/ianalloway/matrix-rain",
+  "homepage": "https://github.com/ianalloway/matrix-rain#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ianalloway/matrix-rain.git"
@@ -62,5 +64,6 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run test && npm run build"
-  }
+  },
+  "sideEffects": false
 }
