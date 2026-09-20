@@ -51,6 +51,10 @@ function App() {
 | `style` | `CSSProperties` | `{}` | Inline style override |
 | `respectReducedMotion` | `boolean` | `true` | Honor `prefers-reduced-motion` |
 | `maxFps` | `number` | `35` | Frame rate cap |
+| `speed` | `number` | `1` | Global fall-speed multiplier |
+| `messages` | `string[]` | — | Optional short strings that occasionally fall as highlighted glyph runs |
+| `messageProbability` | `number` | `0.06` | Chance a resetting column becomes a message column (when `messages` is set) |
+| `messageColor` | `string` | same as `leadColor` | RGB triplet for message glyph runs |
 
 ## Examples
 
@@ -61,6 +65,19 @@ function App() {
   leadColor="255, 100, 200"
   trailColor="255, 50, 150"
   accentColor="0, 255, 255"
+/>
+```
+
+### Message rain
+
+Inject short strings that occasionally drop as highlighted columns amid the normal rain. Omit `messages` (or pass an empty list) for classic random rain only. When `prefers-reduced-motion` is honored, the canvas stays blank — no animated injection.
+
+```tsx
+<MatrixRain
+  messages={['SHIP IT', 'CLV', '0x']}
+  messageProbability={0.1}
+  messageColor="180, 255, 220"
+  speed={1.2}
 />
 ```
 
@@ -84,6 +101,7 @@ function App() {
 - **HiDPI/retina** — Canvas backing store scales by `devicePixelRatio` (capped at 2x) for crisp rendering on all displays.
 - **Battery friendly** — Animation pauses when the tab is hidden, resumes when visible.
 - **Accessible** — `aria-hidden="true"` by default. Respects `prefers-reduced-motion`.
+- **Message rain** — Optional `messages` prop injects short highlighted glyph runs without changing default behavior.
 - **Performant** — Frame rate capped at 35fps, requestAnimationFrame for smooth animation.
 - **Zero runtime dependencies** — Pure React (peer) + browser Canvas 2D API. No animation libraries.
 

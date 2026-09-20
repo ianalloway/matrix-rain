@@ -7,6 +7,8 @@ interface Column {
   speed: number;
   opacity: number;
   length: number;
+  /** When set, this column draws the message as a highlighted glyph run. */
+  message: string | null;
 }
 
 export interface MatrixRainProps {
@@ -58,7 +60,51 @@ export interface MatrixRainProps {
    * Target frames per second cap. Default: 35
    */
   maxFps?: number;
+  /**
+   * Global fall-speed multiplier. Default: 1
+   */
+  speed?: number;
+  /**
+   * Optional short strings that occasionally fall as highlighted glyph runs
+   * amid the normal rain. Empty/omitted keeps classic random rain only.
+   * Ignored when prefers-reduced-motion is honored (animation is skipped).
+   *
+   * @example messages={['SHIP IT', 'CLV', '0x']}
+   */
+  messages?: string[];
+  /**
+   * Chance (0..1) that a resetting column becomes a message column when
+   * `messages` is non-empty. Default: 0.06
+   */
+  messageProbability?: number;
+  /**
+   * RGB triplet for message glyph runs. Default: same as `leadColor`
+   */
+  messageColor?: string;
 }
+
+const createColumn = (
+  cssHeight: number,
+  messages: string[] | undefined,
+  messageProbability: number,
+): Column => {
+  const message =
+    messages && messages.length > 0 && Math.random() < messageProbability
+      ? messages[Math.floor(Math.random() * messages.length)]
+      : null;
+
+  const length = message
+    ? Math.max(message.length, 8 + Math.floor(Math.random() * 8))
+    : 8 + Math.floor(Math.random() * 20);
+
+  return {
+    y: Math.random() * -cssHeight,
+    speed: 0.5 + Math.random() * 1.5,
+    opacity: 0.4 + Math.random() * 0.6,
+    length,
+    message,
+  };
+};
 
 /**
  * MatrixRain — A Matrix-style digital rain animation for React.
@@ -67,6 +113,7 @@ export interface MatrixRainProps {
  * - HiDPI/retina support (capped at 2x DPR for performance)
  * - Auto-pauses when tab is hidden (battery friendly)
  * - Respects prefers-reduced-motion
+ * - Optional message rain (inject short strings as highlighted glyph runs)
  * - Frame-rate capped at 35fps by default
  * - Zero dependencies
  *
@@ -77,7 +124,7 @@ export interface MatrixRainProps {
  * function App() {
  *   return (
  *     <div>
- *       <MatrixRain />
+ *       <MatrixRain messages={['SHIP IT', 'CLV', '0x']} />
  *       <YourContent />
  *     </div>
  *   );
@@ -97,8 +144,15 @@ const MatrixRain = ({
   style,
   respectReducedMotion = true,
   maxFps = 35,
+  speed = 1,
+  messages,
+  messageProbability = 0.06,
+  messageColor,
 }: MatrixRainProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const msgColor = messageColor ?? leadColor;
+  // Stable dep key so identity-changing arrays with the same content don't restart the loop.
+  const messagesKey = messages ? JSON.stringify(messages) : '';
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -108,11 +162,18 @@ const MatrixRain = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const activeMessages = messagesKey
+      ? (JSON.parse(messagesKey) as string[]).map((m) => m.trim()).filter(Boolean)
+      : undefined;
+
     let columns: Column[] = [];
     let animId: number;
     let lastTime = 0;
     let cssWidth = window.innerWidth;
     let cssHeight = window.innerHeight;
+    const speedMul = Math.max(0, speed);
+
+    const spawnColumn = () => createColumn(cssHeight, activeMessages, messageProbability);
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
@@ -124,12 +185,7 @@ const MatrixRain = ({
       canvas.style.height = `${cssHeight}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const cols = Math.floor(cssWidth / fontSize);
-      columns = Array.from({ length: cols }, () => ({
-        y: Math.random() * -cssHeight,
-        speed: 0.5 + Math.random() * 1.5,
-        opacity: 0.4 + Math.random() * 0.6,
-        length: 8 + Math.floor(Math.random() * 20),
-      }));
+      columns = Array.from({ length: cols }, spawnColumn);
     };
 
     const onVisibilityChange = () => {
@@ -140,6 +196,18 @@ const MatrixRain = ({
         lastTime = 0;
         animId = requestAnimationFrame(draw);
       }
+    };
+
+    const glyphFor = (col: Column, trailIndex: number): string => {
+      if (col.message) {
+        // Message reads top→bottom: trailIndex 0 is the lead (bottom / newest),
+        // higher indices walk back toward the start of the string.
+        const msg = col.message;
+        if (trailIndex < msg.length) {
+          return msg[msg.length - 1 - trailIndex];
+        }
+      }
+      return CHARS[Math.floor(Math.random() * CHARS.length)];
     };
 
     const draw = (time: number) => {
@@ -156,12 +224,16 @@ const MatrixRain = ({
 
       columns.forEach((col, i) => {
         const x = i * fontSize;
+        const isMessage = Boolean(col.message);
+        const msgLen = col.message?.length ?? 0;
 
-        // Lead character — bright
+        // Lead character — bright (message leads use messageColor)
         if (col.y > 0 && col.y < cssHeight) {
-          ctx.fillStyle = `rgba(${leadColor}, ${col.opacity})`;
+          ctx.fillStyle = isMessage
+            ? `rgba(${msgColor}, ${Math.min(1, col.opacity + 0.25)})`
+            : `rgba(${leadColor}, ${col.opacity})`;
           ctx.font = `bold ${fontSize}px "Fira Code", monospace`;
-          ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, col.y);
+          ctx.fillText(glyphFor(col, 0), x, col.y);
         }
 
         // Trail characters
@@ -169,22 +241,31 @@ const MatrixRain = ({
           const ty = col.y - t * fontSize;
           if (ty < 0 || ty > cssHeight) continue;
           const fade = 1 - t / col.length;
-          const isAccent = Math.random() < accentProbability;
-          if (isAccent) {
-            ctx.fillStyle = `rgba(${accentColor}, ${fade * col.opacity * 0.7})`;
+          const inMessageRun = isMessage && t < msgLen;
+
+          if (inMessageRun) {
+            ctx.fillStyle = `rgba(${msgColor}, ${fade * col.opacity})`;
+            ctx.font = `bold ${fontSize}px "Fira Code", monospace`;
           } else {
-            ctx.fillStyle = `rgba(${trailColor}, ${fade * col.opacity * trailFade})`;
+            const isAccent = Math.random() < accentProbability;
+            if (isAccent) {
+              ctx.fillStyle = `rgba(${accentColor}, ${fade * col.opacity * 0.7})`;
+            } else {
+              ctx.fillStyle = `rgba(${trailColor}, ${fade * col.opacity * trailFade})`;
+            }
+            ctx.font = `${fontSize}px "Fira Code", monospace`;
           }
-          ctx.font = `${fontSize}px "Fira Code", monospace`;
-          ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, ty);
+          ctx.fillText(glyphFor(col, t), x, ty);
         }
 
-        col.y += fontSize * col.speed;
+        col.y += fontSize * col.speed * speedMul;
         if (col.y > cssHeight + col.length * fontSize && Math.random() > 0.97) {
-          col.y = -col.length * fontSize;
-          col.speed = 0.5 + Math.random() * 1.5;
-          col.opacity = 0.4 + Math.random() * 0.6;
-          col.length = 8 + Math.floor(Math.random() * 20);
+          const next = createColumn(0, activeMessages, messageProbability);
+          col.y = -next.length * fontSize;
+          col.speed = next.speed;
+          col.opacity = next.opacity;
+          col.length = next.length;
+          col.message = next.message;
         }
       });
 
@@ -201,7 +282,21 @@ const MatrixRain = ({
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [fontSize, maxDpr, leadColor, trailColor, accentColor, trailFade, accentProbability, respectReducedMotion, maxFps]);
+  }, [
+    fontSize,
+    maxDpr,
+    leadColor,
+    trailColor,
+    accentColor,
+    trailFade,
+    accentProbability,
+    respectReducedMotion,
+    maxFps,
+    speed,
+    messagesKey,
+    messageProbability,
+    msgColor,
+  ]);
 
   const defaultStyle: React.CSSProperties = {
     position: 'fixed',
