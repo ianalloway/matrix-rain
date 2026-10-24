@@ -99,8 +99,8 @@ Inject short strings that occasionally drop as highlighted columns amid the norm
 ## Features
 
 - **HiDPI/retina** — Canvas backing store scales by `devicePixelRatio` (capped at 2x) for crisp rendering on all displays.
-- **Battery friendly** — Animation pauses when the tab is hidden, resumes when visible.
-- **Accessible** — `aria-hidden="true"` by default. Respects `prefers-reduced-motion`.
+- **Battery friendly** — Animation starts only in a visible tab, pauses when hidden, and resumes when visible.
+- **Accessible** — The decorative canvas is hidden from assistive technology. Changes to `prefers-reduced-motion` take effect immediately: enabling it clears the canvas and stops the loop; disabling it resumes animation when the tab is visible.
 - **Message rain** — Optional `messages` prop injects short highlighted glyph runs without changing default behavior.
 - **Performant** — Frame rate capped at 35fps, requestAnimationFrame for smooth animation.
 - **Zero runtime dependencies** — Pure React (peer) + browser Canvas 2D API. No animation libraries.
@@ -109,7 +109,8 @@ Inject short strings that occasionally drop as highlighted columns amid the norm
 
 ```bash
 npm install
-npm test           # smoke test (vitest)
+npm test           # rendering and animation lifecycle tests (Vitest)
+npm run typecheck  # validate TypeScript source and tests
 npm run build      # produces dist/
 npm run dev        # watch mode
 ```
