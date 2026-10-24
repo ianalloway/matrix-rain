@@ -157,7 +157,7 @@ const MatrixRain = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (respectReducedMotion && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -167,7 +167,7 @@ const MatrixRain = ({
       : undefined;
 
     let columns: Column[] = [];
-    let animId: number;
+    let animId: number | null = null;
     let lastTime = 0;
     let cssWidth = window.innerWidth;
     let cssHeight = window.innerHeight;
@@ -188,11 +188,13 @@ const MatrixRain = ({
       columns = Array.from({ length: cols }, spawnColumn);
     };
 
-    const onVisibilityChange = () => {
-      if (document.hidden) {
-        cancelAnimationFrame(animId);
-        animId = 0;
-      } else if (!animId) {
+    const updateAnimationState = () => {
+      const reducedMotion = respectReducedMotion && motionPreference.matches;
+      if (document.hidden || reducedMotion) {
+        if (animId !== null) cancelAnimationFrame(animId);
+        animId = null;
+        if (reducedMotion) ctx.clearRect(0, 0, cssWidth, cssHeight);
+      } else if (animId === null) {
         lastTime = 0;
         animId = requestAnimationFrame(draw);
       }
@@ -274,13 +276,15 @@ const MatrixRain = ({
 
     resize();
     window.addEventListener('resize', resize);
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    animId = requestAnimationFrame(draw);
+    document.addEventListener('visibilitychange', updateAnimationState);
+    motionPreference.addEventListener('change', updateAnimationState);
+    updateAnimationState();
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId !== null) cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener('visibilitychange', updateAnimationState);
+      motionPreference.removeEventListener('change', updateAnimationState);
     };
   }, [
     fontSize,
