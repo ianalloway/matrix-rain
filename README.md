@@ -39,6 +39,7 @@ function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `fit` | `'viewport' \| 'parent'` | `'viewport'` | Fill the viewport or size the rain to a positioned parent, including after layout changes |
 | `fontSize` | `number` | `13` | Font size in CSS pixels |
 | `maxDpr` | `number` | `2` | Device pixel ratio cap (prevents 3x/4x perf cost) |
 | `leadColor` | `string` | `'200, 255, 200'` | RGB triplet for lead character |
@@ -89,8 +90,8 @@ Inject short strings that occasionally drop as highlighted columns amid the norm
 ### Behind a hero section
 
 ```tsx
-<section style={{ position: 'relative' }}>
-  <MatrixRain opacity={0.3} />
+<section style={{ position: 'relative', minHeight: 240 }}>
+  <MatrixRain fit="parent" opacity={0.3} />
   <h1>Welcome to the Grid</h1>
 </section>
 ```

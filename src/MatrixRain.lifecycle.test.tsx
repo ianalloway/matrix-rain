@@ -60,6 +60,28 @@ describe('MatrixRain animation lifecycle', () => {
     cleanup = hooks.effect?.();
   };
 
+  it('fits and observes a container-sized canvas at the capped pixel ratio', () => {
+    const canvas = Object.assign(hooks.canvas as HTMLCanvasElement, { clientWidth: 250, clientHeight: 90 });
+    Object.assign(window, { devicePixelRatio: 3 });
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    let resize!: () => void;
+    vi.stubGlobal('ResizeObserver', class {
+      observe = observe;
+      disconnect = disconnect;
+      constructor(callback: () => void) { resize = callback; }
+    });
+    mount({ fit: 'parent' });
+    expect([canvas.width, canvas.height]).toEqual([500, 180]);
+    expect(observe).toHaveBeenCalledWith(canvas);
+    Object.assign(canvas, { clientWidth: 125, clientHeight: 50 });
+    resize();
+    expect([canvas.width, canvas.height]).toEqual([250, 100]);
+    if (typeof cleanup === 'function') cleanup();
+    cleanup = undefined;
+    expect(disconnect).toHaveBeenCalledOnce();
+  });
+
   it.each([
     ['🪐', '🪐'],
     ['', '0'],
