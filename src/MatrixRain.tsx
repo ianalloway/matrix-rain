@@ -15,7 +15,7 @@ export interface MatrixRainProps {
   /** Fill the viewport (default) or the nearest positioned parent. */
   fit?: 'viewport' | 'parent';
   /**
-   * Font size in CSS pixels. Default: 13
+   * Font size in CSS pixels, at least 1. Invalid values use the default of 13.
    */
   fontSize?: number;
   /**
@@ -137,7 +137,7 @@ const createColumn = (
  */
 const MatrixRain = ({
   fit = 'viewport',
-  fontSize = 13,
+  fontSize: requestedFontSize = 13,
   maxDpr = 2,
   leadColor = '200, 255, 200',
   trailColor = '0, 200, 70',
@@ -156,6 +156,7 @@ const MatrixRain = ({
   messageColor,
 }: MatrixRainProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fontSize = Number.isFinite(requestedFontSize) && requestedFontSize >= 1 ? requestedFontSize : 13;
   const msgColor = messageColor ?? leadColor;
   // Stable dep key so identity-changing arrays with the same content don't restart the loop.
   const messagesKey = messages ? JSON.stringify(messages) : '';

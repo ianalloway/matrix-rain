@@ -39,8 +39,8 @@ function App() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `fit` | `'viewport' \| 'parent'` | `'viewport'` | Fill the viewport or size the rain to a positioned parent, including after layout changes |
-| `fontSize` | `number` | `13` | Font size in CSS pixels |
+| `fit` | `'viewport'` \| `'parent'` | `'viewport'` | Fill the viewport or size the rain to a positioned parent, including after layout changes |
+| `fontSize` | `number` | `13` | Font size in CSS pixels, at least 1. Smaller or non-finite values use 13. |
 | `maxDpr` | `number` | `2` | Device pixel ratio cap (prevents 3x/4x perf cost) |
 | `leadColor` | `string` | `'200, 255, 200'` | RGB triplet for lead character |
 | `trailColor` | `string` | `'0, 200, 70'` | RGB triplet for trail characters |
@@ -120,6 +120,8 @@ npm run typecheck  # validate TypeScript source and tests
 npm run build      # produces dist/
 npm run dev        # watch mode
 ```
+
+The ESM and CommonJS bundles share the declarations in `dist/index.d.ts`. Run `npm pack --dry-run` to inspect the files that ship.
 
 ## License
 

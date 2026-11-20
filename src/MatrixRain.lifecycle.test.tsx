@@ -97,6 +97,17 @@ describe('MatrixRain animation lifecycle', () => {
     expect(fillText.mock.calls.every(([glyph]) => glyph === expected)).toBe(true);
   });
 
+  it.each([
+    [20, 20], [0, 13], [-1, 13], [0.25, 13], [NaN, 13], [Infinity, 13],
+  ])('uses a bounded column grid for font size %s', (fontSize, expectedSize) => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    mount({ fontSize });
+    // Each frame advances a deterministic column by half a glyph height.
+    frames.get(0)!(100);
+    frames.get(1)!(200);
+    expect(fillText).toHaveBeenCalledWith(expect.any(String), expectedSize, expectedSize / 2);
+  });
+
   it('waits for a tab that was hidden before mount to become visible', () => {
     documentState.hidden = true;
     mount();
