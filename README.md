@@ -52,6 +52,7 @@ function App() {
 | `respectReducedMotion` | `boolean` | `true` | Honor `prefers-reduced-motion` |
 | `maxFps` | `number` | `35` | Frame rate cap |
 | `speed` | `number` | `1` | Global fall-speed multiplier |
+| `characters` | `string` | Binary digits and katakana | Alphabet for random rain glyphs, sampled by Unicode code point. An empty string restores the default. |
 | `messages` | `string[]` | — | Optional short strings that occasionally fall as highlighted glyph runs |
 | `messageProbability` | `number` | `0.06` | Chance a resetting column becomes a message column (when `messages` is set) |
 | `messageColor` | `string` | same as `leadColor` | RGB triplet for message glyph runs |
@@ -67,6 +68,10 @@ function App() {
   accentColor="0, 255, 255"
 />
 ```
+
+### Custom alphabet
+
+For binary rain, use `<MatrixRain characters="01" />`. The alphabet controls the background glyphs and can be combined with highlighted messages.
 
 ### Message rain
 

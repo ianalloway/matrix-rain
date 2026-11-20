@@ -19,6 +19,7 @@ describe('MatrixRain animation lifecycle', () => {
   let media: EventTarget & { matches: boolean };
   let frames: Map<number, FrameRequestCallback>;
   let clearRect: ReturnType<typeof vi.fn>;
+  let fillText: ReturnType<typeof vi.fn>;
   let cleanup: void | (() => void);
 
   beforeEach(() => {
@@ -27,10 +28,11 @@ describe('MatrixRain animation lifecycle', () => {
     frames = new Map();
     let nextFrame = 0; // A request ID of zero must still be cancellable.
     clearRect = vi.fn();
+    fillText = vi.fn();
     hooks.canvas = {
       style: {}, width: 0, height: 0,
       getContext: () => ({
-        setTransform: vi.fn(), clearRect, fillRect: vi.fn(), fillText: vi.fn(),
+        setTransform: vi.fn(), clearRect, fillRect: vi.fn(), fillText,
       }),
     };
     vi.stubGlobal('document', documentState);
@@ -49,6 +51,7 @@ describe('MatrixRain animation lifecycle', () => {
   afterEach(() => {
     if (typeof cleanup === 'function') cleanup();
     cleanup = undefined;
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -56,6 +59,21 @@ describe('MatrixRain animation lifecycle', () => {
     MatrixRain(props);
     cleanup = hooks.effect?.();
   };
+
+  it.each([
+    ['🪐', '🪐'],
+    ['', '0'],
+  ])('draws the configured alphabet %j with a classic fallback', (characters, expected) => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    mount({ characters });
+    for (const time of [100, 200]) {
+      const frame = Array.from(frames.values())[0];
+      frames.clear();
+      frame(time);
+    }
+    expect(fillText.mock.calls.length).toBeGreaterThan(0);
+    expect(fillText.mock.calls.every(([glyph]) => glyph === expected)).toBe(true);
+  });
 
   it('waits for a tab that was hidden before mount to become visible', () => {
     documentState.hidden = true;

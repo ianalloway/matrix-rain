@@ -64,6 +64,8 @@ export interface MatrixRainProps {
    * Global fall-speed multiplier. Default: 1
    */
   speed?: number;
+  /** Alphabet for random rain glyphs. An empty string uses the classic alphabet. */
+  characters?: string;
   /**
    * Optional short strings that occasionally fall as highlighted glyph runs
    * amid the normal rain. Empty/omitted keeps classic random rain only.
@@ -145,6 +147,7 @@ const MatrixRain = ({
   respectReducedMotion = true,
   maxFps = 35,
   speed = 1,
+  characters = CHARS,
   messages,
   messageProbability = 0.06,
   messageColor,
@@ -162,6 +165,7 @@ const MatrixRain = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const glyphs = Array.from(characters || CHARS);
     const activeMessages = messagesKey
       ? (JSON.parse(messagesKey) as string[]).map((m) => m.trim()).filter(Boolean)
       : undefined;
@@ -209,7 +213,7 @@ const MatrixRain = ({
           return msg[msg.length - 1 - trailIndex];
         }
       }
-      return CHARS[Math.floor(Math.random() * CHARS.length)];
+      return glyphs[Math.floor(Math.random() * glyphs.length)];
     };
 
     const draw = (time: number) => {
@@ -297,6 +301,7 @@ const MatrixRain = ({
     respectReducedMotion,
     maxFps,
     speed,
+    characters,
     messagesKey,
     messageProbability,
     msgColor,
