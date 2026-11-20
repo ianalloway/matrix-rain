@@ -12,6 +12,8 @@ interface Column {
 }
 
 export interface MatrixRainProps {
+  /** Fill the viewport (default) or the nearest positioned parent. */
+  fit?: 'viewport' | 'parent';
   /**
    * Font size in CSS pixels. Default: 13
    */
@@ -134,6 +136,7 @@ const createColumn = (
  * ```
  */
 const MatrixRain = ({
+  fit = 'viewport',
   fontSize = 13,
   maxDpr = 2,
   leadColor = '200, 255, 200',
@@ -181,12 +184,14 @@ const MatrixRain = ({
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
-      cssWidth = window.innerWidth;
-      cssHeight = window.innerHeight;
+      cssWidth = fit === 'parent' ? canvas.clientWidth : window.innerWidth;
+      cssHeight = fit === 'parent' ? canvas.clientHeight : window.innerHeight;
       canvas.width = Math.floor(cssWidth * dpr);
       canvas.height = Math.floor(cssHeight * dpr);
-      canvas.style.width = `${cssWidth}px`;
-      canvas.style.height = `${cssHeight}px`;
+      if (fit === 'viewport') {
+        canvas.style.width = `${cssWidth}px`;
+        canvas.style.height = `${cssHeight}px`;
+      }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const cols = Math.floor(cssWidth / fontSize);
       columns = Array.from({ length: cols }, spawnColumn);
@@ -279,6 +284,10 @@ const MatrixRain = ({
     };
 
     resize();
+    const observer = fit === 'parent' && typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(resize)
+      : null;
+    observer?.observe(canvas);
     window.addEventListener('resize', resize);
     document.addEventListener('visibilitychange', updateAnimationState);
     motionPreference.addEventListener('change', updateAnimationState);
@@ -286,11 +295,13 @@ const MatrixRain = ({
 
     return () => {
       if (animId !== null) cancelAnimationFrame(animId);
+      observer?.disconnect();
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', updateAnimationState);
       motionPreference.removeEventListener('change', updateAnimationState);
     };
   }, [
+    fit,
     fontSize,
     maxDpr,
     leadColor,
@@ -308,7 +319,8 @@ const MatrixRain = ({
   ]);
 
   const defaultStyle: React.CSSProperties = {
-    position: 'fixed',
+    position: fit === 'parent' ? 'absolute' : 'fixed',
+    ...(fit === 'parent' ? { width: '100%', height: '100%' } : {}),
     inset: 0,
     pointerEvents: 'none',
     zIndex: 0,
